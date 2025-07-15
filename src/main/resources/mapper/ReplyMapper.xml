@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ikkikki.demo.mapper.ReplyMapper">
+
+<!-- 게시글에 달린 모든 댓글 조회 -->
+	<select id="list" resultType="reply">
+			select * from tbl_reply 
+			where bno = #{bno}
+		<if test="lastRno != null">
+		<![CDATA[
+			and rno < #{lastRno} 
+		]]>
+		</if>
+			order by rno 
+			desc limit 5;
+	</select>
+	
+<!-- 댓글 단일조회 -->
+	<select id="selectOne" resultType="reply">
+			select * from tbl_reply 
+			where rno = #{rno}
+	</select>
+	
+<!-- 댓글 등록 -->
+	<insert id="insert">
+			insert into tbl_reply (content, id, bno) values (#{content}, #{id}, #{bno})
+			<selectKey resultType="long" keyProperty="rno" order="AFTER">
+				select max(rno) from tbl_reply
+			</selectKey>
+	</insert>
+	
+<!-- 댓글 수정 -->
+	<update id="update">
+		update tbl_reply set
+		content = #{content}
+		where rno = #{rno}
+	</update>
+	
+<!-- 댓글 삭제 -->
+	<delete id="delete">
+		delete from tbl_reply
+		where rno = #{rno}
+	</delete>
+	<delete id="deleteByBno">
+		delete from tbl_reply
+		where bno = #{bno}
+	</delete>
+	
+
+</mapper>
