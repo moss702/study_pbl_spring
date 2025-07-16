@@ -1,5 +1,7 @@
 package com.ikkikki.demo.util;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -14,6 +16,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Properties;
 
+@Slf4j
+@Component
 public class S3Util {
 	private static final Properties props = PropsLoaderUtil.getProperties("secret/aws_s3.properties");
 	

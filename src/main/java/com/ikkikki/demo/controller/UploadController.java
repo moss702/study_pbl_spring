@@ -4,6 +4,11 @@ import com.google.gson.Gson;
 import com.ikkikki.demo.domain.Attach;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Part;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -93,8 +99,47 @@ public class UploadController {
     }
     return ResponseEntity.ok().body(attachs);
   }
-
   private String genPath() {
     return new SimpleDateFormat("yyyy/MM/dd").format(new Date().getTime());
   }
+
+  // -------------- 파일 DISPLAY
+  @GetMapping("display")
+  public ResponseEntity<?> display(Attach attach) throws IOException {
+    File file = new File(UPLOAD_PATH + "/" + attach.getPath(), attach.getUuid());
+    if (!file.exists()) {
+      return ResponseEntity.notFound().build();
+    }
+
+    // 응답 헤더 설정
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Content-Type", Files.probeContentType(file.toPath()));
+    headers.add("Content-Length", String.valueOf(file.length()));
+
+    // 아웃풋스트림 실제 출력
+    Resource resource = new FileSystemResource(file);
+    return ResponseEntity.ok().headers(headers).body(resource);
+  }
+
+
+  // -------------- 파일 DOWNLOAD
+  @GetMapping("download")
+  public ResponseEntity<?> download(Attach attach) throws IOException {
+    File file = new File(UPLOAD_PATH + "/" + attach.getPath(), attach.getUuid());
+    if (!file.exists()) {
+      return ResponseEntity.notFound().build();
+    }
+
+    // 응답 헤더 설정
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+    headers.setContentLength(file.length());
+    headers.setContentDisposition(ContentDisposition.attachment().filename(URLEncoder.encode(attach.getOrigin(), "utf-8").replaceAll("\\+", "%20")).build());
+
+    // 아웃풋스트림 실제 출력
+    Resource resource = new FileSystemResource(file);
+    return ResponseEntity.ok().headers(headers).body(resource);
+  }
+
+
 }

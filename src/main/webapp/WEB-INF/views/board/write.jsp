@@ -177,18 +177,31 @@
 			});
 
 		})
-		$("#writeForm").submit(function(){
-			event.preventDefault();
+		$("#writeForm").submit(function(e){
+			e.preventDefault();
+
+      // $(this).append($("<input>").attr({type : "hidden", name : "attachs[0].uuid", value : "test-uuid.png"}));
+
+      // const formData = new FormData(this); // 비동기 첨부파일 전송
+			// formData.append("attachs[0].uuid", "test-uuid.png")
+
 			const data = [];
 			$(".attach-list li").each(function() {
 				data.push({...this.dataset});
 			});
-			console.log(JSON.stringify(data));
-			data.forEach((item, idx) => item.odr = idx);
-			// attbut에 있던 속성들을 다시 덮어쓰기
-			
-			$("[name='encodedStr']").val(JSON.stringify(data));
-			this.submit();
+      console.log(data);
+
+      for(let d in data) { //d? 데이터의 '오브젝트' 하나.
+				for(let i in data[d]){ // i(키)? 첨부파일의 속성 image, odr, origin ...
+          $(this).append($("<input>").attr({type : "hidden", name : `attachs[\${d}].\${i}`, value : data[d][i]}));
+					console.log(i, data[d][i]); // 키, 밸류 여기서부터 잘 가져오는지 먼저 확인.
+					debugger;
+        }
+			}
+      console.log(this)
+
+
+			$(this).off().submit();
 		})
 	})
 	</script>
@@ -196,4 +209,6 @@
 
 <%@ include file="../common/footer.jsp" %>
 </body>
+
 </html>
+

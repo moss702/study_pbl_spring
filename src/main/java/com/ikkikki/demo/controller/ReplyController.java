@@ -38,8 +38,8 @@ public class ReplyController {
   }
 
   // 댓글 수정
-  @PutMapping("/")
-  public Map<String, Object> modify(@RequestBody Reply reply){
+  @PutMapping("{rno}")
+  public Map<String, Object> modify(@RequestBody Reply reply, @PathVariable Long rno){
     replyService.modify(reply);
     return Map.of("result", true, "reply", reply);
   }
