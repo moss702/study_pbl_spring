@@ -39,3 +39,4 @@ out/
 ### Secret ###
 /secret/
 application.yml
+src/main/resources/secret/
